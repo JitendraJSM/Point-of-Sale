@@ -1,0 +1,816 @@
+openapi: 3.0.0
+info:
+  title: Point of Sale API
+  description: API documentation for Point of Sale system
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+paths:
+  /vendors:
+    get:
+      summary: Get all vendors
+      responses:
+        '200':
+          description: List of vendors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vendor'
+    delete:
+      summary: Delete all vendors
+      responses:
+        '204':
+          description: All vendors deleted successfully
+    post:
+      summary: Create a new vendor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '201':
+          description: Vendor created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/Vendor'
+
+  /vendors/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a specific vendor
+      responses:
+        '200':
+          description: Vendor details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/Vendor'
+    patch:
+      summary: Update a vendor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '200':
+          description: Vendor updated successfully
+    delete:
+      summary: Delete a vendor
+      responses:
+        '204':
+          description: Vendor deleted successfully
+
+  /customers:
+    get:
+      summary: Get all customers
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+    delete:
+      summary: Delete all customers
+      responses:
+        '204':
+          description: All customers deleted successfully
+    post:
+      summary: Create a new customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/Customer'
+
+  /customers/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a specific customer
+      responses:
+        '200':
+          description: Customer details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/Customer'
+    patch:
+      summary: Update a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '200':
+          description: Customer updated successfully
+    delete:
+      summary: Delete a customer
+      responses:
+        '204':
+          description: Customer deleted successfully
+
+  /products:
+    get:
+      summary: Get all products
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+    delete:
+      summary: Delete all products
+      responses:
+        '204':
+          description: All products deleted successfully
+    post:
+      summary: Create a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Product created successfully
+
+  /products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a specific product
+      responses:
+        '200':
+          description: Product details
+    patch:
+      summary: Update a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Product updated successfully
+    delete:
+      summary: Delete a product
+      responses:
+        '204':
+          description: Product deleted successfully
+
+  /purchases:
+    get:
+      summary: Get all purchases
+      responses:
+        '200':
+          description: List of purchases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Purchase'
+    post:
+      summary: Create a new purchase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseInput'
+      responses:
+        '201':
+          description: Purchase created successfully
+
+  /purchases/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a specific purchase
+      responses:
+        '200':
+          description: Purchase details
+    patch:
+      summary: Update a purchase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseInput'
+      responses:
+        '200':
+          description: Purchase updated successfully
+    delete:
+      summary: Delete a purchase
+      responses:
+        '204':
+          description: Purchase deleted successfully
+
+  /purchases/{id}/payments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Add payment to purchase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '200':
+          description: Payment added successfully
+
+  /sales:
+    get:
+      summary: Get all sales
+      responses:
+        '200':
+          description: List of sales
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sale'
+    post:
+      summary: Create a new sale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleInput'
+      responses:
+        '201':
+          description: Sale created successfully
+
+  /sales/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a specific sale
+      responses:
+        '200':
+          description: Sale details
+    patch:
+      summary: Update a sale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleInput'
+      responses:
+        '200':
+          description: Sale updated successfully
+    delete:
+      summary: Delete a sale
+      responses:
+        '204':
+          description: Sale deleted successfully
+
+  /sales/{id}/complete:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Complete a sale
+      responses:
+        '200':
+          description: Sale completed successfully
+
+  /sales/{id}/payments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Add payment to sale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '200':
+          description: Payment added successfully
+
+components:
+  schemas:
+    Vendor:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        balance:
+          type: number
+        transactions:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [purchase, payment]
+              amount:
+                type: number
+              date:
+                type: string
+                format: date-time
+              purchaseBillId:
+                type: string
+    Customer:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        balance:
+          type: number
+        transactions:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              amount:
+                type: number
+              date:
+                type: string
+                format: date-time
+              invoiceId:
+                type: string
+
+    CustomerInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        sku:
+          type: string
+        barcode:
+          type: string
+        unit:
+          type: string
+        stock:
+          type: object
+          properties:
+            current:
+              type: number
+            minimum:
+              type: number
+            maximum:
+              type: number
+        price:
+          type: object
+          properties:
+            selling:
+              type: number
+            purchase:
+              type: number
+        vendors:
+          type: array
+          items:
+            type: object
+            properties:
+              vendor:
+                type: string
+                description: Reference to Vendor model
+              lastPurchasePrice:
+                type: number
+              lastPurchaseDate:
+                type: string
+                format: date-time
+        stockMovement:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [in, out]
+              quantity:
+                type: number
+              date:
+                type: string
+                format: date-time
+              reference:
+                type: string
+
+    ProductInput:
+      type: object
+      required:
+        - name
+        - price
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        stock:
+          type: object
+          properties:
+            current:
+              type: number
+            minimum:
+              type: number
+        price:
+          type: object
+          properties:
+            selling:
+              type: number
+            purchase:
+              type: number
+
+    Purchase:
+      type: object
+      properties:
+        _id:
+          type: string
+        billNumber:
+          type: string
+        vendor:
+          type: string
+        billDate:
+          type: string
+          format: date-time
+        inventoryDate:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+              quantity:
+                type: number
+              unitPrice:
+                type: number
+              total:
+                type: number
+              taxCategory:
+                type: string
+              taxRate:
+                type: number
+              taxAmount:
+                type: number
+        totalAmount:
+          type: number
+        totalTaxAmount:
+          type: number
+        taxBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              rate:
+                type: number
+              amount:
+                type: number
+        paymentStatus:
+          type: string
+          enum: [unpaid, partial, paid]
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        notes:
+          type: string
+
+    PurchaseInput:
+      type: object
+      required:
+        - vendor
+        - billNumber
+        - billDate
+        - items
+      properties:
+        vendor:
+          type: string
+        billNumber:
+          type: string
+        billDate:
+          type: string
+          format: date-time
+        inventoryDate:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - product
+              - quantity
+              - unitPrice
+              - taxCategory
+              - taxRate
+            properties:
+              product:
+                type: string
+              quantity:
+                type: number
+              unitPrice:
+                type: number
+              taxCategory:
+                type: string
+              taxRate:
+                type: number
+        notes:
+          type: string
+
+    Sale:
+      type: object
+      properties:
+        _id:
+          type: string
+        invoiceNumber:
+          type: string
+        customer:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+              quantity:
+                type: number
+              unitPrice:
+                type: number
+              total:
+                type: number
+              taxCategory:
+                type: string
+              taxRate:
+                type: number
+              taxAmount:
+                type: number
+        totalAmount:
+          type: number
+        totalTaxAmount:
+          type: number
+        taxBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              rate:
+                type: number
+              amount:
+                type: number
+        discount:
+          type: number
+        finalAmount:
+          type: number
+        status:
+          type: string
+          enum: [pending, completed, cancelled]
+        paymentStatus:
+          type: string
+          enum: [unpaid, partial, paid]
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+
+    SaleInput:
+      type: object
+      required:
+        - customer
+        - items
+      properties:
+        customer:
+          type: string
+        invoiceNumber:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - product
+              - quantity
+              - unitPrice
+              - taxCategory
+              - taxRate
+            properties:
+              product:
+                type: string
+              quantity:
+                type: number
+              unitPrice:
+                type: number
+              taxCategory:
+                type: string
+              taxRate:
+                type: number
+        discount:
+          type: number
+
+    Payment:
+      type: object
+      properties:
+        amount:
+          type: number
+        date:
+          type: string
+          format: date-time
+        method:
+          type: string
+          enum: [cash, card, bank_transfer, cheque]
+
+    PaymentInput:
+      type: object
+      required:
+        - amount
+        - method
+      properties:
+        amount:
+          type: number
+        date:
+          type: string
+          format: date-time
+        method:
+          type: string
+          enum: [cash, card, bank_transfer, cheque]
