@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 const customerRoutes = require("./routes/customerRoutes");
 const vendorRoutes = require("./routes/vendorRoutes");
 const productRoutes = require("./routes/productRoutes");
-// const purchaseRoutes = require("./routes/purchaseRoutes");
+const purchaseRoutes = require("./routes/purchaseRoutes");
 // const salesRoutes = require("./routes/saleRoutes");
 // const financeRoutes = require("./routes/financeRoutes");
 
@@ -28,12 +28,18 @@ const productRoutes = require("./routes/productRoutes");
 app.use("/api/v1/customers", customerRoutes);
 app.use("/api/v1/vendors", vendorRoutes);
 app.use("/api/v1/products", productRoutes);
-// app.use("/api/v1/purchases", purchaseRoutes);
+app.use("/api/v1/purchases", purchaseRoutes);
 // app.use("/api/v1/sales", salesRoutes);
 // app.use("/api/v1/finance", financeRoutes);
 
+// Handling unhandled routes
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
 // Error handling middleware (should be after all routes)
 const errorHandler = require("./controllers/errorController");
+const AppError = require("./utils/AppError");
 app.use(errorHandler);
 
 const port = process.env.PORT || 3000;

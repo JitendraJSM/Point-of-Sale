@@ -56,6 +56,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Product name is required"],
       unique: true,
+      lowercase: true,
       trim: true,
     },
     description: {

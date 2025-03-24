@@ -27,6 +27,8 @@ const vendorSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Vendor name is required"],
+      unique: true,
+      lowercase: true,
       trim: true,
     },
     email: {
@@ -36,11 +38,11 @@ const vendorSchema = new mongoose.Schema(
       match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
     },
     phone: {
-      //###--- apply a phone number validator here
       type: String,
       required: [true, "Phone number is required"],
       unique: true,
       trim: true,
+      set: (v) => v.replace(/[^0-9]/g, ""),
     },
     address: {
       type: String,
