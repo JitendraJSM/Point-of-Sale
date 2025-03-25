@@ -79,6 +79,7 @@ exports.createPurchase = catchAsync(async (req, res) => {
       name: purchaseData.vendorName,
       phone: purchaseData.vendorPhone,
     });
+
     console.log(`Vendor created: ${vendor.name}`);
   }
 
@@ -133,26 +134,30 @@ exports.createPurchase = catchAsync(async (req, res) => {
   // 3. Create purchase with processed items
   try {
     // 3.1 Create purchase
-    const purchase = await Purchase.create({
-      billNumber: purchaseData.billNumber,
-      vendor: vendor._id,
-      vendorName: vendor.vendorName,
-      billDate: purchaseData.billDate,
-      inventoryDate: purchaseData.inventoryDate,
-      items: processedItems,
-      totalAmount: processedItems.reduce(
-        (sum, item) => sum + item.totalAmountItemWise,
-        0
-      ),
-      totalTaxAmount: processedItems.reduce(
-        (sum, item) => sum + item.taxAmount,
-        0
-      ),
-      paymentStatus: purchaseData.paymentStatus,
-      payments: purchaseData.payments,
-      notes: purchaseData.notes,
-    });
-    console.log(`Purchase created: ${purchase._id}`);
+    try {
+      const purchase = await Purchase.create({
+        billNumber: purchaseData.billNumber,
+        vendor: vendor._id,
+        vendorName: vendor.vendorName,
+        billDate: purchaseData.billDate,
+        inventoryDate: purchaseData.inventoryDate,
+        items: processedItems,
+        totalAmount: processedItems.reduce(
+          (sum, item) => sum + item.totalAmountItemWise,
+          0
+        ),
+        totalTaxAmount: processedItems.reduce(
+          (sum, item) => sum + item.taxAmount,
+          0
+        ),
+        paymentStatus: purchaseData.paymentStatus,
+        payments: purchaseData.payments,
+        notes: purchaseData.notes,
+      });
+      console.log(`Purchase created: ${purchase._id}`);
+    } catch (error) {
+      throw new Error(`Error creating purchase: ${error.message}`);
+    }
 
     // 3.3 Update products stock and vendor info
     for (const item of processedItems) {
@@ -222,7 +227,7 @@ exports.createPurchase = catchAsync(async (req, res) => {
       data: purchase,
     });
   } catch (error) {
-    // If any error occurs during the process, we need to handle it appropriately
+    // If any error occurs during any of the above 3 processes, we need to handle it appropriately
     // In a production environment, you might want to implement a rollback mechanism here
     // console.log(`-=-=-=-=-=-=-=-=-=-);
     // console.log(error);
