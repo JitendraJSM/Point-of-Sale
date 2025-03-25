@@ -166,7 +166,7 @@ exports.createPurchase = catchAsync(async (req, res) => {
           type: "in",
           quantity: item.quantity,
           unitPurchasePrice: item.unitPurchasePrice,
-          date: purchase.purchaseDate,
+          date: purchase.billDate,
           billNumber: purchase.billNumber,
           billDate: purchase.billDate,
           vendor: vendor._id,
@@ -183,13 +183,13 @@ exports.createPurchase = catchAsync(async (req, res) => {
           product.vendors[vendorIndex].vendorName = vendor.name;
           product.vendors[vendorIndex].lastPurchasePrice =
             item.unitPurchasePrice;
-          product.vendors[vendorIndex].lastPurchaseDate = purchase.purchaseDate;
+          product.vendors[vendorIndex].lastPurchaseDate = purchase.billDate;
         } else {
           product.vendors.push({
             vendor: vendor._id,
             vendorName: vendor.name,
             lastPurchasePrice: item.unitPurchasePrice,
-            lastPurchaseDate: purchase.purchaseDate,
+            lastPurchaseDate: purchase.billDate,
           });
         }
 
@@ -203,13 +203,19 @@ exports.createPurchase = catchAsync(async (req, res) => {
 
     //###--- Till everything is checked so go add other fields using reference of purchase model.
     // 3.2 Update vendor balance and add transaction
-    vendor.transactions.push({
-      type: "purchase",
-      amount: purchase.totalAmount,
-      date: purchase.purchaseDate,
-      purchaseBillId: purchase._id,
-    });
-    await vendor.save();
+    try {
+      vendor.transactions.push({
+        type: "purchase",
+        amount: purchase.totalAmountWithTax,
+        date: purchase.billDate,
+        purchase: purchase._id,
+      });
+      await vendor.save();
+    } catch (error) {
+      throw new Error(
+        `Error adding transaction to vendor ${vendor.name}: ${error.message}`
+      );
+    }
 
     res.status(201).json({
       status: "success",
@@ -295,7 +301,7 @@ exports.addPayment = catchAsync(async (req, res) => {
     type: "payment",
     amount: req.body.amount,
     date: req.body.date || Date.now(),
-    purchaseBillId: purchase._id,
+    purchase: purchase._id,
   });
   await vendor.save();
 
