@@ -152,44 +152,57 @@ exports.createPurchase = catchAsync(async (req, res) => {
       payments: purchaseData.payments,
       notes: purchaseData.notes,
     });
+    console.log(`Purchase created: ${purchase._id}`);
 
-    //###--- Till everything is checked so go add other fields using reference of purchase model.
     // 3.3 Update products stock and vendor info
     for (const item of processedItems) {
-      // 3.3.1 Find product
-      const product = await Product.findById(item.product._id);
+      try {
+        // 3.3.1 Find product
+        const product = await Product.findById(item.product._id);
 
-      // 3.3.2 Update stock
-      product.stock.current += item.quantity;
-      product.stockMovement.push({
-        type: "in",
-        quantity: item.quantity,
-        date: purchase.purchaseDate,
-        billNumber: purchase.billNumber,
-        reference: purchase._id,
-        vendor: vendor._id,
-        vendorName: vendor.name,
-      });
-
-      // 3.3.3 Update vendor info
-      const vendorIndex = product.vendors.findIndex(
-        (v) => v.vendor.toString() === vendor._id.toString()
-      );
-      if (vendorIndex >= 0) {
-        product.vendors[vendorIndex].lastPurchasePrice = item.unitPurchasePrice;
-        product.vendors[vendorIndex].lastPurchaseDate = purchase.purchaseDate;
-      } else {
-        product.vendors.push({
+        // 3.3.2 Update stock
+        product.stock.current += item.quantity;
+        product.stockMovement.push({
+          type: "in",
+          quantity: item.quantity,
+          unitPurchasePrice: item.unitPurchasePrice,
+          date: purchase.purchaseDate,
+          billNumber: purchase.billNumber,
+          billDate: purchase.billDate,
           vendor: vendor._id,
-          lastPurchasePrice: item.unitPurchasePrice,
-          lastPurchaseDate: purchase.purchaseDate,
+          vendorName: vendor.name,
+          vendorPhone: vendor.phone,
+          reference: purchase._id,
         });
-      }
 
-      await product.save();
+        // 3.3.3 Update vendor info
+        const vendorIndex = product.vendors.findIndex(
+          (v) => v.vendor.toString() === vendor._id.toString()
+        );
+        if (vendorIndex >= 0) {
+          product.vendors[vendorIndex].vendorName = vendor.name;
+          product.vendors[vendorIndex].lastPurchasePrice =
+            item.unitPurchasePrice;
+          product.vendors[vendorIndex].lastPurchaseDate = purchase.purchaseDate;
+        } else {
+          product.vendors.push({
+            vendor: vendor._id,
+            vendorName: vendor.name,
+            lastPurchasePrice: item.unitPurchasePrice,
+            lastPurchaseDate: purchase.purchaseDate,
+          });
+        }
+
+        await product.save();
+      } catch (error) {
+        throw new Error(
+          `Error processing item ${item.product.name}: ${error.message}`
+        );
+      }
     }
+
+    //###--- Till everything is checked so go add other fields using reference of purchase model.
     // 3.2 Update vendor balance and add transaction
-    vendor.balance += purchase.totalAmount;
     vendor.transactions.push({
       type: "purchase",
       amount: purchase.totalAmount,

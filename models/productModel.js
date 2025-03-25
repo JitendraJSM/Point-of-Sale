@@ -6,6 +6,10 @@ const vendorSchema = new mongoose.Schema({
     ref: "Vendor",
     required: true,
   },
+  vendorName: {
+    type: String,
+    required: true, // Remove required: true and add this using pre-save middleware
+  },
   lastPurchasePrice: {
     type: Number,
     required: true,
@@ -26,6 +30,11 @@ const stockMovementSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  unitPurchasePrice: {
+    type: Number,
+    required: true,
+    min: [0, "Purchase price of a unit can't be negative"],
+  },
   date: {
     type: Date,
     default: Date.now,
@@ -33,6 +42,10 @@ const stockMovementSchema = new mongoose.Schema({
   billNumber: {
     type: String,
     required: true, // Remove required: true and add this using pre-save middleware
+  },
+  billDate: {
+    type: Date,
+    default: Date.now,
   },
   vendor: {
     type: mongoose.Schema.Types.ObjectId,
@@ -42,6 +55,11 @@ const stockMovementSchema = new mongoose.Schema({
   vendorName: {
     type: String,
     required: true, // Remove required: true and add this using pre-save middleware
+  },
+  vendorPhone: {
+    type: String,
+    required: true,
+    set: (v) => v.replace(/[^0-9]/g, ""),
   },
   reference: {
     type: mongoose.Schema.Types.ObjectId,
