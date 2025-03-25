@@ -72,6 +72,11 @@ const purchaseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    vendorPhone: {
+      type: Number,
+      required: true,
+      set: (v) => v.replace(/[^0-9]/g, ""),
+    },
     billDate: {
       type: Date,
       required: true,

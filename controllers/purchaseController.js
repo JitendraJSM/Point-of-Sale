@@ -129,20 +129,20 @@ exports.createPurchase = catchAsync(async (req, res) => {
     });
   }
 
-  //***Code given above of this function is checked by Er. Jitendra Nath
-  //***Code given below of this function is checked by Er. Jitendra Nath
   // 3. Create purchase with processed items
   try {
     // 3.1 Create purchase
+    let purchase;
     try {
-      const purchase = await Purchase.create({
+      purchase = await Purchase.create({
         billNumber: purchaseData.billNumber,
         vendor: vendor._id,
-        vendorName: vendor.vendorName,
+        vendorName: vendor.name,
+        vendorPhone: vendor.phone,
         billDate: purchaseData.billDate,
-        inventoryDate: purchaseData.inventoryDate,
+        inventoryDate: Date(purchaseData.inventoryDate),
         items: processedItems,
-        totalAmount: processedItems.reduce(
+        totalAmountWithTax: processedItems.reduce(
           (sum, item) => sum + item.totalAmountItemWise,
           0
         ),
@@ -232,6 +232,7 @@ exports.createPurchase = catchAsync(async (req, res) => {
     // console.log(`-=-=-=-=-=-=-=-=-=-);
     // console.log(error);
     // console.log(`-=-=-=-=-=-=-=-=-=-);
+    console.log(error);
 
     throw error;
   }
